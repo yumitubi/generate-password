@@ -8,40 +8,40 @@ import sys
 import os
 import re
 
-def gen_dict():
+
+
+def gen_dict_fsmb():
     """generate dictionary symbols
     
     Arguments:
     - `file`: source
     """
+
+    dict_fsmb = {} # словарь первых двух символов
+    key_dict = ''
     re_patt = re.compile('[A-Za-z]')
-    openfile = open('/home/mak/devel/scripts/old_work/gen_pass/pereraboka.txt', 'r')
-    file_r = openfile.readlines()
-    dict_alfavit = { 'a':0,  'b':1,  'c':2,  'd':3,  'e':4,
-                     'f':5,  'g':6,  'h':7,  'i':8,  'j':9,
-                     'k':10, 'l':11, 'm':12, 'n':13, 'o':14,
-                     'p':15, 'q':16, 'r':17, 's':18, 't':19,
-                     't':20, 'u':21, 'v':22, 'w':23, 'x':24,
-                     'y':25, 'z':26 }
-    dict_words   = { 'a':[], 'b':[], 'c':[], 'd':[], 'e':[],
-                     'f':[], 'g':[], 'h':[], 'i':[], 'j':[],
-                     'k':[], 'l':[], 'm':[], 'n':[], 'o':[],
-                     'p':[], 'q':[], 'r':[], 's':[], 't':[],
-                     't':[], 'u':[], 'v':[], 'w':[], 'x':[],
-                     'y':[], 'z':[] }
-    for i in dict_words:
-        dict_words[i] = [ 0 for t in xrange(0, 27) ]
-    old_s = 's'
+    try:
+        openfile = open('/home/mak/devel/scripts/old_work/gen_pass/pereraboka.txt', 'r')
+        file_r = openfile.readlines()
+    except:
+        print 'Файла не существует'
+
     for st in file_r:
-       for smb in st:
-           if re_patt.findall(smb):
-               z = dict_alfavit[smb.lower()]
-               print z
-               dict_words[old_s.lower()][z]+=1
-               old_s = smb
-    return dict_words
+        for smb in st:
+            if smb == ' ':
+                key_dict = ''
+            if re_patt.findall(smb):
+                key_dict = key_dict + smb.lower()
+                if len(key_dict) == 2:
+                    if dict_fsmb.has_key(key_dict):
+                        dict_fsmb[key_dict] += 1
+                    else:
+                        dict_fsmb[key_dict] = 1
+    return dict_fsmb
 
 
+
+        
 def get_passwd():
     """generate paswd
     """
