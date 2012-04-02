@@ -40,7 +40,7 @@ def gen_dict_fsmb(sfile):
 def gen_dict_othsmb(sfile):
     """generate dictionary other symbols
     """
-    dict_othsmb = {} #словарь правил для остальных символов
+    dict_othsmb = {} # словарь правил для остальных двойных символов
     key_dict = ''
     re_patt = re.compile('[A-Za-z]')
     try:
@@ -72,7 +72,7 @@ def gen_dict_othsmb(sfile):
 def gen_dict_one_s(sfile):
     """generate if one symbols in prev dictionary
     """
-    dict_one_smb = {} #словарь правил для остальных символов
+    dict_one_smb = {} # словарь правил для одного символа
     key_dict = ''
     re_patt = re.compile('[A-Za-z]')
     try:
@@ -104,7 +104,7 @@ def gen_dict_one_s(sfile):
 def gen_dict_exc(sfile):
     """generate dictionary symbols where is not in combination
     """
-    dict_smb = {}
+    dict_smb = {} # словарь для получения рандомных символов
     re_patt = re.compile('[A-Za-z]')
     try:
         openfile = open(sfile, 'r')
