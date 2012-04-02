@@ -13,6 +13,7 @@ sfile = '/home/mak/devel/scripts/old_work/gen_pass/pereraboka.txt'
 dict_first = gen_dict_fsmb(sfile)
 dict_sec = gen_dict_othsmb(sfile)
 dict_ran = gen_dict_exc(sfile)
+dict_one = gen_dict_one_s(sfile)
 
 def gen_pass(dict_f, dict_s, dict_r, dict_o, len_pass):
     """generate password
@@ -24,7 +25,6 @@ def gen_pass(dict_f, dict_s, dict_r, dict_o, len_pass):
     - `dict_o`: dictionary alone symbols    
     - `len_pass`: lenth of pass
     """
-    # password = ''
     list_f = []
     for k, v in dict_f.items():
         for p in range(v):
@@ -38,34 +38,31 @@ def gen_pass(dict_f, dict_s, dict_r, dict_o, len_pass):
         for p3 in range(v3):
             list_r.append(k3)
     itr = 0
-    for k, v in dict_s.items():
-        if itr < len_pass: # ограничиваем длину пароля
-            if k == pr_st:
-                for k2, v2 in v.items():
-                    for p in range(v2):
-                        list_s.append(p)
-                f_st = f_st + random.sample(list_s, 1)[0]
-                pr_st = f_st[-1:]
-                list_s = []
-            elif k[-1:] == pr_st[-1:]:
-                first_smb = f_st[-1:]
-                print 'first smb %s' % first_smb
-                sec_smb = random.sample(list_r, 1)[0]
-                while first_smb == sec_smb:
-                    sec_smb = random.sample(list_r, 1)[0]
-                    
-            else:
-                first_smb = f_st[-1:]
-                print 'first smb %s' % first_smb
-                sec_smb = random.sample(list_r, 1)[0]
-                while first_smb == sec_smb:
-                    sec_smb = random.sample(list_r, 1)[0]
-                f_st = f_st + sec_smb
-                pr_st = f_st[-2:]
-            itr +=1
+    while itr < len_pass:
+        if dict_s.has_key(pr_st):
+            for k, v in dict_s[pr_st].items():
+                for p in range(v):
+                    list_s.append(k)
+            f_st = f_st + random.sample(list_s, 1)[0]
+            pr_st = f_st[-2:]
+            list_s = []
+        elif dict_o.has_key(f_st[-1:]):
+            for k2, v2 in dict_o[f_st[-1:]].items():
+                for p in range(v2):
+                    list_s.append(k2)
+            f_st = f_st + random.sample(list_s, 1)[0]
+            pr_st = f_st[-2:]
+            list_s = []
         else:
-            break
+            first_smb = f_st[-1:]
+            print 'first smb %s' % first_smb
+            sec_smb = random.sample(list_r, 1)[0]
+            while first_smb == sec_smb:
+                sec_smb = random.sample(list_r, 1)[0]
+            f_st = f_st + sec_smb
+            pr_st = f_st[-2:]
+        itr = itr + 1
     print f_st
     
-gen_pass(dict_first, dict_sec, dict_ran, 10)
+gen_pass(dict_first, dict_sec, dict_ran, dict_one, 10)
     

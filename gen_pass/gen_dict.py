@@ -63,9 +63,9 @@ def gen_dict_othsmb(sfile):
                         if dict_othsmb[d_smb].has_key(smb):
                             dict_othsmb[d_smb][smb] += 1
                         else:
-                            dict_othsmb[d_smb][smb] = 1
+                            dict_othsmb[d_smb][smb.lower()] = 1
                     else:
-                        dict_othsmb[d_smb] = { smb:1 }
+                        dict_othsmb[d_smb] = { smb.lower():1 }
     openfile.close()
     return dict_othsmb
 
