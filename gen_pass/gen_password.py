@@ -37,17 +37,22 @@ def gen_pass(dict_f, dict_s, dict_r, len_pass):
             list_r.append(k3)
     itr = 0
     for k, v in dict_s.items():
-        if itr < 10:
+        if itr < len_pass: # ограничиваем длину пароля
             if k == pr_st:
                 for k2, v2 in v.items():
                     for p in range(v2):
                         list_s.append(p)
                 f_st = f_st + random.sample(list_s, 1)[0]
                 pr_st = f_st[-1:]
+                list_s = []
             else:
-                list_s.append(random.sample(list_r, 1)[0])
-                f_st = f_st + random.sample(list_s, 1)[0]
-                pr_st = f_st[-1:]
+                first_smb = f_st[-1:]
+                print 'first smb %s' % first_smb
+                sec_smb = random.sample(list_r, 1)[0]
+                while first_smb == sec_smb:
+                    sec_smb = random.sample(list_r, 1)[0]
+                f_st = f_st + sec_smb
+                pr_st = f_st[-2:]
             itr +=1
         else:
             break

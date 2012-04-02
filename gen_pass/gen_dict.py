@@ -68,7 +68,14 @@ def gen_dict_othsmb(sfile):
                         dict_othsmb[d_smb] = { smb:1 }
     openfile.close()
     return dict_othsmb
+
+def gen_dict_one_s(sfile):
+    """generate if one symbols in prev dictionary
+    """
     
+
+
+
 def gen_dict_exc(sfile):
     """generate dictionary symbols where is not in combination
     """
