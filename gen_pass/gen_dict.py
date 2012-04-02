@@ -19,7 +19,7 @@ def gen_dict_fsmb(sfile):
         openfile = open(sfile, 'r')
         file_r = openfile.readlines()
     except:
-        print 'Файла не существует'
+        print 'Файл не существует'
     #------------------------------------------------------------
     # генерим словарь вида {'gu': 7, 'gr': 20, 'ge': 7, 'ga': 8}
     #------------------------------------------------------------        
@@ -47,7 +47,7 @@ def gen_dict_othsmb(sfile):
         openfile = open(sfile, 'r')
         file_r = openfile.readlines()
     except:
-        print 'Файла не существует'
+        print 'Файл не существует'
     #------------------------------------------------------------
     # генерим словарь вида {'ab':{'c':1, 'm':2}, 'bc':{'d':1}}
     #------------------------------------------------------------
@@ -69,3 +69,25 @@ def gen_dict_othsmb(sfile):
     openfile.close()
     return dict_othsmb
     
+def gen_dict_exc(sfile):
+    """generate dictionary symbols where is not in combination
+    """
+    dict_smb = {}
+    re_patt = re.compile('[A-Za-z]')
+    try:
+        openfile = open(sfile, 'r')
+        file_r = openfile.readlines()
+    except:
+        print 'Файл не существует'
+    #------------------------------------------------------------
+    # генерим словарь вида {'a':1, 'm':2}
+    #------------------------------------------------------------
+    for st in file_r:
+        for smb in st:
+            if re_patt.findall(smb):
+                if dict_smb.has_key(smb):
+                    dict_smb[smb] +=1
+                else:
+                    dict_smb[smb.lower()] = 1
+    return dict_smb
+
