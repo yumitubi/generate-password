@@ -6,6 +6,7 @@
 from gen_dict import gen_dict_fsmb
 from gen_dict import gen_dict_othsmb
 from gen_dict import gen_dict_exc
+from gen_dict import gen_dict_one_s
 import random
 
 sfile = '/home/mak/devel/scripts/old_work/gen_pass/pereraboka.txt'
@@ -13,13 +14,14 @@ dict_first = gen_dict_fsmb(sfile)
 dict_sec = gen_dict_othsmb(sfile)
 dict_ran = gen_dict_exc(sfile)
 
-def gen_pass(dict_f, dict_s, dict_r, len_pass):
+def gen_pass(dict_f, dict_s, dict_r, dict_o, len_pass):
     """generate password
     
     Arguments:
     - `dict_f`: dictionary first two symbols
     - `dict_s`: dictionary all other symbols
     - `dict_r`: dictionary all other random symbols
+    - `dict_o`: dictionary alone symbols    
     - `len_pass`: lenth of pass
     """
     # password = ''
@@ -45,6 +47,13 @@ def gen_pass(dict_f, dict_s, dict_r, len_pass):
                 f_st = f_st + random.sample(list_s, 1)[0]
                 pr_st = f_st[-1:]
                 list_s = []
+            elif k[-1:] == pr_st[-1:]:
+                first_smb = f_st[-1:]
+                print 'first smb %s' % first_smb
+                sec_smb = random.sample(list_r, 1)[0]
+                while first_smb == sec_smb:
+                    sec_smb = random.sample(list_r, 1)[0]
+                    
             else:
                 first_smb = f_st[-1:]
                 print 'first smb %s' % first_smb
