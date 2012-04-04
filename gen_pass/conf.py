@@ -8,5 +8,11 @@
 len_pass = 10
 
 # исходный текст для генерации словаря
-sfile = '/home/mak/devel/scripts/old_work/gen_pass/pereraboka.txt'
+sfile = 'Italian.dic'
+
+# Куда сохранять словари после генерации
+path_to_dicts = './dicts/'
+
+# Префикс словаря
+dfile = 'test'
 
