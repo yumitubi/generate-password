@@ -142,53 +142,41 @@ def dict_pass_rules(liststring):
     main_dict['first_two_smb'] = gen_dict_first_smbs(liststring)
     main_dict['next_smb'] = gen_dict_other_smb(liststring)
     main_dict['next_smb_if_one'] = gen_dict_one_smb(liststring)
-    main_dict['not_found_smb'] = gen_dict_except_smb(liststring)
+    main_dict['not_found'] = gen_dict_except_smb(liststring)
     return main_dict
 
-def gen_password(dict_f, dict_s, dict_r, dict_o, len_pass):
+def random_element(dictionary):
+    """ Return random key from dictionary with a light weight
+    Arguments:
+    - `dictionary`: dictionary type - { 'a':45, 'b':78, 'c':98 }
+    """
+    total = sum(dictionary.values())
+    random_num = random.uniform(0, total)
+    for key in sorted(dictionary.keys()):
+        item = key
+        if random_num < dictionary[key]:
+            break
+        random_num -= dictionary[key]
+    return item
+
+def gen_password(main_dict, lenth_pass):
     """generate password
     Arguments:
-    - `dict_f`: dictionary first two symbols ~ {'gu': 7, 'gr': 20, 'ge': 7, 'ga': 8}
-    - `dict_s`: dictionary all other symbols ~ {'ab':{'c':1, 'm':2}, 'bc':{'d':1}}
-    - `dict_r`: dictionary all other random symbols ~ {'a':1, 'm':2}
-    - `dict_o`: dictionary alone symbols ~ {'a':{'c':1, 'm':2}, 'b':{'d':1}}    
-    - `len_pass`: lenth of pass
+    - `main_dict`: main dictionary include all all mini dictionaries    
+    - `lenth_pass`: lenth of pass
     """
-    list_f = []
-    for k, v in dict_f.items():
-        for p in range(v):
-            list_f.append(k)
-    f_st = random.sample(list_f, 1)[0]
-    list_s = []
-    list_r = []
-    pr_st = f_st
-    # генерация списка для несуществующих в словаре комбинаций символов
-    for k3, v3 in dict_r.items():
-        for p3 in range(v3):
-            list_r.append(k3)
-    itr = 0
-    while itr < len_pass:
-        if dict_s.has_key(pr_st): # если имеется совпадение с ключем из двух символов
-            for k, v in dict_s[pr_st].items():
-                for p in range(v):
-                    list_s.append(k)
-            f_st = f_st + random.sample(list_s, 1)[0]
-            pr_st = f_st[-2:]
-            list_s = []
-        elif dict_o.has_key(f_st[-1:]): # если имеются совпадение с ключем из одного символа
-            for k2, v2 in dict_o[f_st[-1:]].items():
-                for p in range(v2):
-                    list_s.append(k2)
-            f_st = f_st + random.sample(list_s, 1)[0]
-            pr_st = f_st[-2:]
-            list_s = []
-        else: # если нет совпадений, то random с учетом предыдущего символа
-            first_smb = f_st[-1:]
-            print 'first smb %s' % first_smb
-            sec_smb = random.sample(list_r, 1)[0]
-            while first_smb == sec_smb:
-                sec_smb = random.sample(list_r, 1)[0]
-            f_st = f_st + sec_smb
-            pr_st = f_st[-2:]
-        itr = itr + 1
-    return f_st
+    password = random_element(main_dict['first_two_smb'])
+    dict_next_smb = main_dict['next_smb']
+    dict_smb_if_one = main_dict['next_smb_if_one']
+    last_smbs = password
+    while len(password) <= lenth_pass:
+        if dict_next_smb.has_key(last_smbs):
+            password = password + random_element(dict_next_smb[last_smbs])
+            last_smbs = password[-2:]
+        elif dict_smb_if_one.has_key(last_smbs[-1:]):
+            password = password + random_element(dict_smb_if_one[last_smbs[-1:]])
+            last_smbs = password[-2:]
+        else:
+            password = password + random_element(main_dict['not_found'])
+            last_smbs = password[-2:]
+    return password
