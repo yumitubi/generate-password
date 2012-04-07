@@ -20,11 +20,6 @@ parser.add_argument('-l', '--lenth-pass', metavar='N', type=int, default=9,
 
 args = parser.parse_args()
 
-print args.create_dict
-print args.from_file
-print args.dict_pass
-print args.lenth_pass
-
 if args.create_dict and args.from_file:
     liststring = genpassword.read_file(args.from_file)
     print 'Генерация словаря...'
@@ -33,9 +28,6 @@ if args.create_dict and args.from_file:
     print 'Словарь был сохранен в файл ' + args.create_dict
 
 if args.dict_pass:
-    print 'Загружаю словарь...'
     dict_rules = genpassword.get_dict_from_file(args.dict_pass)
-    print 'Генерация пароля начата...'
-    print 'Ваш новый пароль: ' 
     print genpassword.gen_password(dict_rules, args.lenth_pass)
 
