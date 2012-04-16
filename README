@@ -1,2 +1,12 @@
-My scripts
+This is password's generator.
 
+--- How this work --------------------
+
+After installing package to do:
+1. Create dictionary rules
+$ gen-pass.py -c test.dic -f source_text.txt
+2. Create your new password:
+$ gen-pass.py -d test.dic
+
+For example, source_text.txt may be get here:
+http://www.insidepro.com/rus/download.shtml
