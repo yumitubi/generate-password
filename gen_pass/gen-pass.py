@@ -15,6 +15,8 @@ parser.add_argument('-f', '--from-file', metavar='name_file',
                     help='Указывает, из какого файла брать текст для составления словаря')
 parser.add_argument('-d', '--dict-pass', metavar='name_dictionary',
                     help='Выбрает словарь, на основе которого будет сгенерирован пароль')
+parser.add_argument('-v2', '--version-two', metavar='N', type=int, default=1,
+                    help='Использовать новый алгоритм генерации пароля')
 parser.add_argument('-l', '--lenth-pass', metavar='N', type=int, default=9,
                     help='Указать длину пароля, поумолчанию - 9 символов')
 
@@ -31,3 +33,7 @@ if args.dict_pass:
     dict_rules = genpassword.get_dict_from_file(args.dict_pass)
     print genpassword.gen_password(dict_rules, args.lenth_pass)
 
+if args.dict_pass and args.version_two:
+    dict_rules = genpassword.get_dict_from_file(args.dict_pass)
+    print genpassword.gen_password_with_none(dict_rules, args.lenth_pass)
+    

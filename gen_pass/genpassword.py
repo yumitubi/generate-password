@@ -34,6 +34,9 @@ def get_dict_from_file(name_file):
     data = json.load(open(name_file, 'r'))
     return data
 
+#------------------------------------------------------------
+# Генерация словарей
+#------------------------------------------------------------
 def gen_dict_first_smbs(liststring):
     """generate dictionary first and second symbols
     Arguments:
@@ -132,7 +135,41 @@ def gen_dict_except_smb(liststring):
                 else:
                     dict_smb[smb.lower()] = 1
     return dict_smb
-    
+
+def gen_dict_all_on_one(liststring):
+    """generate dictionary symbols, where simbol NONE is empty symbol
+    example, in begin word
+    Arguments:
+    - `liststring`: list of string
+    """
+    dict_with_none_smb = {}
+    key_dict = ''
+    valua_dict = ('NONE', 'NONE')
+    re_patt = re.compile('[a-z]')
+    #-------------------------------------------------------------------
+    # генерируем словарь вида { ab:{c:2, k:7}, NONEc:{d:3}, NONENONE:{s:8, t:9} }
+    #-------------------------------------------------------------------
+    #------------------------------------------------------------
+    # сделать комментарии алгаритма, что приведен ниже  
+    #------------------------------------------------------------
+    for string in liststring:
+        for symbol in string:
+            if symbol == ' ' or symbol == '\n' or symbol == '\t':
+                key_dict = ''
+                valua_dict = ('NONE', 'NONE')
+            symbol_lower = symbol.lower()
+            if re_patt.findall(symbol_lower):
+                key_dict = valua_dict[0] + valua_dict[1]
+                valua_dict = (valua_dict[1], symbol_lower)
+                if dict_with_none_smb.has_key(key_dict):
+                    if dict_with_none_smb[key_dict].has_key(symbol_lower):
+                        dict_with_none_smb[key_dict][symbol_lower] += 1
+                    else:
+                        dict_with_none_smb[key_dict][symbol_lower] = 1
+                else:
+                    dict_with_none_smb[key_dict] = { symbol_lower:1}
+    return dict_with_none_smb
+
 def dict_pass_rules(liststring):
     """ Create dictionary rules for generate passwords
     Arguments:
@@ -143,6 +180,7 @@ def dict_pass_rules(liststring):
     main_dict['next_smb'] = gen_dict_other_smb(liststring)
     main_dict['next_smb_if_one'] = gen_dict_one_smb(liststring)
     main_dict['not_found'] = gen_dict_except_smb(liststring)
+    main_dict['all_on_one'] = gen_dict_all_on_one(liststring)
     return main_dict
 
 def random_element(dictionary):
@@ -180,3 +218,30 @@ def gen_password(main_dict, lenth_pass):
             password = password + random_element(main_dict['not_found'])
             last_smbs = password[-2:]
     return password
+
+def gen_password_with_none(main_dict, lenth_pass):
+    """generate password
+    Arguments:
+    - `main_dict`: main dictionary include all all mini dictionaries    
+    - `lenth_pass`: lenth of pass
+    """
+    password = random_element(main_dict['all_on_one']['NONENONE'])
+    two_symbol = 'NONE' + password
+    if main_dict['all_on_one'].has_key(two_symbol):
+        password = password + random_element(main_dict['all_on_one'][two_symbol])
+    else:
+        password = password + random_element(main_dict['not_found'])
+    next_symbols = password
+    while len(password) < lenth_pass:
+        if main_dict['all_on_one'].has_key(next_symbols):
+            password = password + random_element(main_dict['all_on_one'][next_symbols])
+            next_symbols = password[-2:]
+        else:
+            password = password + random_element(main_dict['not_found'])
+            next_symbols = password[-2:]
+    return password
+
+
+
+        
+
