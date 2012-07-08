@@ -197,6 +197,28 @@ def random_element(dictionary):
         random_num -= dictionary[key]
     return item
 
+#------------------------------------------------------------
+# вспомогательные функции для расчета вероятностей
+# создания того или иного пароля
+#------------------------------------------------------------
+
+def probability(dictionary):
+    """return most big probability select symbol 
+    Arguments:
+    - `dictionary`: type of dictionary - { 'a':45, 'b':78, 'c':98 }
+    """
+    summa = 0
+    greatest = 0
+    for key in dictionary:
+        if dictionary[key] > greatest:
+            greatest = dictionary[key]
+        summa = summa + dictionary[key]
+    return float(greatest)/summa
+
+#------------------------------------------------------------
+# Функции генерации паролей
+#------------------------------------------------------------
+
 def gen_password(main_dict, lenth_pass):
     """generate password
     Arguments:
@@ -220,7 +242,7 @@ def gen_password(main_dict, lenth_pass):
     return password
 
 def gen_password_with_none(main_dict, lenth_pass):
-    """generate password
+    """generate password on base main_dict['all_on_one']
     Arguments:
     - `main_dict`: main dictionary include all all mini dictionaries    
     - `lenth_pass`: lenth of pass
@@ -241,6 +263,30 @@ def gen_password_with_none(main_dict, lenth_pass):
             next_symbols = password[-2:]
     return password
 
+def gen_password_verification_probability(main_dict, lenth_pass):
+    """generate password
+    Arguments:
+    - `main_dict`: main dictionary include all all mini dictionaries    
+    - `lenth_pass`: lenth of pass
+    """
+    password = random_element(main_dict['all_on_one']['NONENONE'])
+    probability_smb = probability(main_dict['all_on_one']['NONENONE'])
+    two_symbol = 'NONE' + password
+    if main_dict['all_on_one'].has_key(two_symbol):
+        password = password + random_element(main_dict['all_on_one'][two_symbol])
+        probability_smb = probability_smb * probability(main_dict['all_on_one'][two_symbol])
+    else:
+        password = password + random_element(main_dict['not_found'])
+    next_symbols = password
+    while len(password) < lenth_pass:
+        if main_dict['all_on_one'].has_key(next_symbols):
+            password = password + random_element(main_dict['all_on_one'][next_symbols])
+            probability_smb = probability_smb * probability(main_dict['all_on_one'][next_symbols])
+            next_symbols = password[-2:]
+        else:
+            password = password + random_element(main_dict['not_found'])
+            next_symbols = password[-2:]
+    return password, probability_smb
 
 
         

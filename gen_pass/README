@@ -98,6 +98,7 @@ gen_dict_except_smb(liststring)
 TODO сделать описание функций:
 gen_dict_all_on_one(liststring):
 gen_password_with_none(main_dict, lenth_pass):
+probability(dictionary)
 
 Краткую инструкцию по использованию утилиты gen-pass вы
 можете увидеть, введя команду:
