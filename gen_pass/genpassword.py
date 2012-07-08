@@ -168,6 +168,24 @@ def gen_dict_all_on_one(liststring):
                         dict_with_none_smb[key_dict][symbol_lower] = 1
                 else:
                     dict_with_none_smb[key_dict] = { symbol_lower:1}
+    #------------------------------------------------------------
+    # сглаживаем особо большое значение весов у некоторых комбинаций
+    # это должно позволить уменьшить число повторяемости паролей
+    #------------------------------------------------------------
+    summa = 0
+    middle_value = 0
+    counter = 0
+    for key in dict_with_none_smb:
+        for key2 in dict_with_none_smb[key]:
+            summa += dict_with_none_smb[key][key2]
+            counter += 1
+        middle_value = summa/counter
+        for key2 in dict_with_none_smb[key]:
+            if dict_with_none_smb[key][key2] > middle_value*2.5:
+                dict_with_none_smb[key][key2] = middle_value*2.5
+        summa = 0
+        counter = 0
+        middle_value = 0
     return dict_with_none_smb
 
 def dict_pass_rules(liststring):
@@ -176,9 +194,9 @@ def dict_pass_rules(liststring):
     - `liststring`: list of string
     """
     main_dict = {}
-    main_dict['first_two_smb'] = gen_dict_first_smbs(liststring)
-    main_dict['next_smb'] = gen_dict_other_smb(liststring)
-    main_dict['next_smb_if_one'] = gen_dict_one_smb(liststring)
+    # main_dict['first_two_smb'] = gen_dict_first_smbs(liststring)
+    # main_dict['next_smb'] = gen_dict_other_smb(liststring)
+    # main_dict['next_smb_if_one'] = gen_dict_one_smb(liststring)
     main_dict['not_found'] = gen_dict_except_smb(liststring)
     main_dict['all_on_one'] = gen_dict_all_on_one(liststring)
     return main_dict
@@ -196,24 +214,6 @@ def random_element(dictionary):
             break
         random_num -= dictionary[key]
     return item
-
-#------------------------------------------------------------
-# вспомогательные функции для расчета вероятностей
-# создания того или иного пароля
-#------------------------------------------------------------
-
-def probability(dictionary):
-    """return most big probability select symbol 
-    Arguments:
-    - `dictionary`: type of dictionary - { 'a':45, 'b':78, 'c':98 }
-    """
-    summa = 0
-    greatest = 0
-    for key in dictionary:
-        if dictionary[key] > greatest:
-            greatest = dictionary[key]
-        summa = summa + dictionary[key]
-    return float(greatest)/summa
 
 #------------------------------------------------------------
 # Функции генерации паролей
@@ -263,30 +263,7 @@ def gen_password_with_none(main_dict, lenth_pass):
             next_symbols = password[-2:]
     return password
 
-def gen_password_verification_probability(main_dict, lenth_pass):
-    """generate password
-    Arguments:
-    - `main_dict`: main dictionary include all all mini dictionaries    
-    - `lenth_pass`: lenth of pass
-    """
-    password = random_element(main_dict['all_on_one']['NONENONE'])
-    probability_smb = probability(main_dict['all_on_one']['NONENONE'])
-    two_symbol = 'NONE' + password
-    if main_dict['all_on_one'].has_key(two_symbol):
-        password = password + random_element(main_dict['all_on_one'][two_symbol])
-        probability_smb = probability_smb * probability(main_dict['all_on_one'][two_symbol])
-    else:
-        password = password + random_element(main_dict['not_found'])
-    next_symbols = password
-    while len(password) < lenth_pass:
-        if main_dict['all_on_one'].has_key(next_symbols):
-            password = password + random_element(main_dict['all_on_one'][next_symbols])
-            probability_smb = probability_smb * probability(main_dict['all_on_one'][next_symbols])
-            next_symbols = password[-2:]
-        else:
-            password = password + random_element(main_dict['not_found'])
-            next_symbols = password[-2:]
-    return password, probability_smb
+
 
 
         
