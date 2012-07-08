@@ -37,86 +37,6 @@ def get_dict_from_file(name_file):
 #------------------------------------------------------------
 # Генерация словарей
 #------------------------------------------------------------
-def gen_dict_first_smbs(liststring):
-    """generate dictionary first and second symbols
-    Arguments:
-    - `liststring`: list of string
-    """
-    dict_fsmb = {} # словарь первых двух символов
-    key_dict = ''
-    re_patt = re.compile('[A-Za-z]')
-    #------------------------------------------------------------
-    # генерим словарь вида {'gu': 7, 'gr': 20, 'ge': 7, 'ga': 8}
-    #------------------------------------------------------------        
-    for st in liststring:
-        for smb in st:
-            if smb == ' ' or smb == '\n' or smb == '\t':
-                key_dict = ''
-            if re_patt.findall(smb):
-                key_dict = key_dict + smb.lower()
-                if len(key_dict) == 2:
-                    if dict_fsmb.has_key(key_dict):
-                        dict_fsmb[key_dict] += 1
-                    else:
-                        dict_fsmb[key_dict] = 1
-    return dict_fsmb
-
-def gen_dict_other_smb(liststring):
-    """generate dictionary other symbols
-    Arguments:
-    - `liststring`: list of string
-    """
-    dict_othsmb = {} # словарь правил для остальных двойных символов
-    key_dict = ''
-    re_patt = re.compile('[A-Za-z]')
-    #------------------------------------------------------------
-    # генерим словарь вида {'ab':{'c':1, 'm':2}, 'bc':{'d':1}}
-    #------------------------------------------------------------
-    for st in liststring:
-        for smb in st:
-            if smb == ' ' or smb == '\n' or smb == '\t':
-                key_dict = ''
-            if re_patt.findall(smb):
-                key_dict = key_dict + smb.lower()
-                if len(key_dict) > 2:
-                    d_smb = key_dict[-3:-1]
-                    if dict_othsmb.has_key(d_smb):
-                        if dict_othsmb[d_smb].has_key(smb):
-                            dict_othsmb[d_smb][smb] += 1
-                        else:
-                            dict_othsmb[d_smb][smb.lower()] = 1
-                    else:
-                        dict_othsmb[d_smb] = { smb.lower():1 }
-    return dict_othsmb
-
-def gen_dict_one_smb(liststring):
-    """generate dictionary if one symbols in prev dictionary
-    Arguments:
-    - `liststring`: list of string
-    """
-    dict_one_smb = {} # словарь правил для одного символа
-    key_dict = ''
-    re_patt = re.compile('[A-Za-z]')
-    #------------------------------------------------------------
-    # генерим словарь вида {'a':{'c':1, 'm':2}, 'b':{'d':1}}
-    #------------------------------------------------------------
-    for st in liststring:
-        for smb in st:
-            if smb == ' ' or smb == '\n' or smb == '\t':
-                key_dict = ''
-            if re_patt.findall(smb):
-                key_dict = key_dict + smb.lower()
-                if len(key_dict) > 1:
-                    o_smb = key_dict[-2:-1]
-                    if dict_one_smb.has_key(o_smb):
-                        if dict_one_smb[o_smb].has_key(smb):
-                            dict_one_smb[o_smb][smb] += 1
-                        else:
-                            dict_one_smb[o_smb][smb.lower()] = 1
-                    else:
-                        dict_one_smb[o_smb] = { smb.lower():1 }
-    return dict_one_smb
-
 def gen_dict_except_smb(liststring):
     """generate dictionary symbols where is not found combinations
     Arguments:
@@ -194,9 +114,6 @@ def dict_pass_rules(liststring):
     - `liststring`: list of string
     """
     main_dict = {}
-    # main_dict['first_two_smb'] = gen_dict_first_smbs(liststring)
-    # main_dict['next_smb'] = gen_dict_other_smb(liststring)
-    # main_dict['next_smb_if_one'] = gen_dict_one_smb(liststring)
     main_dict['not_found'] = gen_dict_except_smb(liststring)
     main_dict['all_on_one'] = gen_dict_all_on_one(liststring)
     return main_dict
@@ -218,29 +135,6 @@ def random_element(dictionary):
 #------------------------------------------------------------
 # Функции генерации паролей
 #------------------------------------------------------------
-
-def gen_password(main_dict, lenth_pass):
-    """generate password
-    Arguments:
-    - `main_dict`: main dictionary include all all mini dictionaries    
-    - `lenth_pass`: lenth of pass
-    """
-    password = random_element(main_dict['first_two_smb'])
-    dict_next_smb = main_dict['next_smb']
-    dict_smb_if_one = main_dict['next_smb_if_one']
-    last_smbs = password
-    while len(password) < lenth_pass:
-        if dict_next_smb.has_key(last_smbs):
-            password = password + random_element(dict_next_smb[last_smbs])
-            last_smbs = password[-2:]
-        elif dict_smb_if_one.has_key(last_smbs[-1:]):
-            password = password + random_element(dict_smb_if_one[last_smbs[-1:]])
-            last_smbs = password[-2:]
-        else:
-            password = password + random_element(main_dict['not_found'])
-            last_smbs = password[-2:]
-    return password
-
 def gen_password_with_none(main_dict, lenth_pass):
     """generate password on base main_dict['all_on_one']
     Arguments:
@@ -263,8 +157,40 @@ def gen_password_with_none(main_dict, lenth_pass):
             next_symbols = password[-2:]
     return password
 
+#------------------------------------------------------------
+# функции для тестирования
+#------------------------------------------------------------
+def test_dictionary(num_pass, dictionary, file_pass, lenth_pass):
+    """generate big numbers of passwords in file
+    Arguments:
+    - `num_pass`: number passwords
+    - `dictionary`: dictionary file
+    - `file_pass`: there save passwords
+    - `lenth_pass`: lenth password
+    """
+    import time
+    start = time.time()
+    pfile = open(file_pass, 'w')
+    dicts = get_dict_from_file(dictionary)
+    for i in range(num_pass):
+        password = gen_password_with_none(dicts, lenth_pass)
+        pfile.write(password + '\n')
+    pfile.close()
+    finish = time.time()
+    print "Сгенерировано за %s секунд." % (finish - start)
 
-
-
-        
-
+def info_passwords(name_file, num_last_password):
+    """return information about passwords
+    Arguments:
+    - `name_file`: name of file passwords
+    """
+    import os
+    
+    num_string = 0
+    pfile = open(name_file, 'r')
+    for string in pfile.readlines():
+        num_string += 1
+    print "Количество паролей: %s" % num_string
+    pfile.close()
+    print "Последних в списке %s повторяющихся паролей" % num_last_password 
+    os.system('cat %s | sort -n | uniq -c | sort -n | tail -n %s' % (name_file, num_last_password))
