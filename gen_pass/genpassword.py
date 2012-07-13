@@ -42,7 +42,10 @@ def gen_dict_except_smb(liststring):
     Arguments:
     - `liststring`: list of string
     """
-    dict_smb = {} # словарь для получения рандомных символов
+    # словарь для получения рандомных символов
+    # в дальнейшем он используется, если сгенерированной комбинации
+    # ненайдено в основном словаре
+    dict_smb = {} 
     re_patt = re.compile('[A-Za-z]')
     #------------------------------------------------------------
     # генерим словарь вида {'a':1, 'm':2}
@@ -56,11 +59,12 @@ def gen_dict_except_smb(liststring):
                     dict_smb[smb.lower()] = 1
     return dict_smb
 
-def gen_dict_all_on_one(liststring):
+def gen_dict_all_on_one(liststring, max_value=2.5):
     """generate dictionary symbols, where simbol NONE is empty symbol
     example, in begin word
     Arguments:
     - `liststring`: list of string
+    - `max_value`: maximum value 
     """
     dict_with_none_smb = {}
     key_dict = ''
@@ -69,9 +73,11 @@ def gen_dict_all_on_one(liststring):
     #-------------------------------------------------------------------
     # генерируем словарь вида { ab:{c:2, k:7}, NONEc:{d:3}, NONENONE:{s:8, t:9} }
     #-------------------------------------------------------------------
-    #------------------------------------------------------------
-    # сделать комментарии алгаритма, что приведен ниже  
-    #------------------------------------------------------------
+    # Алгоритм примерно такой:
+    # Если пробел, ввод или таб - сбрасываем значение переменных
+    # Если это буква из латиницы, то если ключ уже есть в словаре, 
+    # делаем плюс к весам, если нет, то делаем новый ключ с весами = 1
+    #-------------------------------------------------------------------
     for string in liststring:
         for symbol in string:
             if symbol == ' ' or symbol == '\n' or symbol == '\t':
@@ -90,7 +96,7 @@ def gen_dict_all_on_one(liststring):
                     dict_with_none_smb[key_dict] = { symbol_lower:1}
     #------------------------------------------------------------
     # сглаживаем особо большое значение весов у некоторых комбинаций
-    # это должно позволить уменьшить число повторяемости паролей
+    # это позволяет уменьшить число повторяемых паролей
     #------------------------------------------------------------
     summa = 0
     middle_value = 0
@@ -101,8 +107,8 @@ def gen_dict_all_on_one(liststring):
             counter += 1
         middle_value = summa/counter
         for key2 in dict_with_none_smb[key]:
-            if dict_with_none_smb[key][key2] > middle_value*2.5:
-                dict_with_none_smb[key][key2] = middle_value*2.5
+            if dict_with_none_smb[key][key2] > middle_value*max_value:
+                dict_with_none_smb[key][key2] = middle_value*max_value
         summa = 0
         counter = 0
         middle_value = 0
@@ -123,6 +129,7 @@ def random_element(dictionary):
     Arguments:
     - `dictionary`: dictionary type - { 'a':45, 'b':78, 'c':98 }
     """
+    # Возвращает рандомный элемент с учетом его веса 
     total = sum(dictionary.values())
     random_num = random.uniform(0, total)
     for key in sorted(dictionary.keys()):
@@ -158,7 +165,7 @@ def gen_password_with_none(main_dict, lenth_pass):
     return password
 
 #------------------------------------------------------------
-# функции для тестирования
+# вспомогательные функции
 #------------------------------------------------------------
 def test_dictionary(num_pass, dictionary, file_pass, lenth_pass):
     """generate big numbers of passwords in file
@@ -168,6 +175,7 @@ def test_dictionary(num_pass, dictionary, file_pass, lenth_pass):
     - `file_pass`: there save passwords
     - `lenth_pass`: lenth password
     """
+    # пишет в файл заданное количество паролей, хоть миллион
     import time
     start = time.time()
     pfile = open(file_pass, 'w')
@@ -184,6 +192,8 @@ def info_passwords(name_file, num_last_password):
     Arguments:
     - `name_file`: name of file passwords
     """
+    # возвращает некоторую информацию о сгенерированных в файле паролях
+    # такую, как количество паролей, и выводит список наиболее повторяющихся
     import os
     
     num_string = 0
