@@ -182,7 +182,8 @@ def test_dictionary(num_pass, dictionary, file_pass, lenth_pass):
     dicts = get_dict_from_file(dictionary)
     for i in range(num_pass):
         password = gen_password_with_none(dicts, lenth_pass)
-        pfile.write(password + '\n')
+        pfile.write(password.encode('utf8') + u'\n')
+    pfile.flush()
     pfile.close()
     finish = time.time()
     print "Сгенерировано за %s секунд." % (finish - start)

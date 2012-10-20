@@ -44,4 +44,5 @@ if args.save_pass:
     print "Сгенерировано %s паролей" % args.generate_pass
 
 if args.info:
-    genpassword.info_passwords(args.save_pass, args.last_pass)
+    print args.save_pass, args.last_pass
+    genpassword.info_passwords(args.info, args.last_pass)
