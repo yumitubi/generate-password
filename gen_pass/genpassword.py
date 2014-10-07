@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-# генератор словарей
+# Dictionaries Generator
 #------------------------------------------------------------
 """
 This is set of functions ...
-""" 
-
+"""
 import re
 import json
 import random
+
 
 def read_file(source_file):
     """open file for get list of strings
@@ -18,6 +18,7 @@ def read_file(source_file):
     with open(source_file, 'r') as openfile:
         return openfile.readlines()
 
+
 def save_dict_in_file(dict_json, name_file):
     """ save dictionary in file
     Arguments:
@@ -25,6 +26,7 @@ def save_dict_in_file(dict_json, name_file):
     - `dict_json`: name file for save to hard
     """
     json.dump(dict_json, open(name_file, 'w'))
+
 
 def get_dict_from_file(name_file):
     """load dictionary from file on the hard
@@ -34,48 +36,50 @@ def get_dict_from_file(name_file):
     data = json.load(open(name_file, 'r'))
     return data
 
+
 #------------------------------------------------------------
-# Генерация словарей
+# Dictionaries generation
 #------------------------------------------------------------
 def gen_dict_except_smb(liststring):
     """generate dictionary symbols where is not found combinations
     Arguments:
     - `liststring`: list of string
     """
-    # словарь для получения рандомных символов
-    # в дальнейшем он используется, если сгенерированной комбинации
-    # ненайдено в основном словаре
-    dict_smb = {} 
-    re_patt = re.compile('[A-Za-z]')
+    # dictionary to creating random words.
+    # it is for cases when generated combination
+    # is absent in main dictionary
+    dict_smb = {}
+    re_patt = re.compile(r'\w')
     #------------------------------------------------------------
-    # генерим словарь вида {'a':1, 'm':2}
+    # generating dictionary such as {'a':1, 'm':2}
     #------------------------------------------------------------
     for st in liststring:
         for smb in st:
             if re_patt.findall(smb):
-                if dict_smb.has_key(smb):
+                if dict_smb.get(smb) is not None:
                     dict_smb[smb] += 1
                 else:
                     dict_smb[smb.lower()] = 1
     return dict_smb
+
 
 def gen_dict_all_on_one(liststring, max_value=2.5):
     """generate dictionary symbols, where simbol NONE is empty symbol
     example, in begin word
     Arguments:
     - `liststring`: list of string
-    - `max_value`: maximum value 
+    - `max_value`: maximum value
     """
     dict_with_none_smb = {}
     key_dict = ''
     valua_dict = ('NONE', 'NONE')
-    re_patt = re.compile('[a-z]')
+    re_patt = re.compile('\w')
     #-------------------------------------------------------------------
-    # генерируем словарь вида { ab:{c:2, k:7}, NONEc:{d:3}, NONENONE:{s:8, t:9} }
+    # generates dictionary such as { ab:{c:2, k:7}, NONEc:{d:3}, NONENONE:{s:8, t:9} }
     #-------------------------------------------------------------------
     # Алгоритм примерно такой:
     # Если пробел, ввод или таб - сбрасываем значение переменных
-    # Если это буква из латиницы, то если ключ уже есть в словаре, 
+    # Если это буква из латиницы, то если ключ уже есть в словаре,
     # делаем плюс к весам, если нет, то делаем новый ключ с весами = 1
     #-------------------------------------------------------------------
     for string in liststring:
@@ -87,13 +91,13 @@ def gen_dict_all_on_one(liststring, max_value=2.5):
             if re_patt.findall(symbol_lower):
                 key_dict = valua_dict[0] + valua_dict[1]
                 valua_dict = (valua_dict[1], symbol_lower)
-                if dict_with_none_smb.has_key(key_dict):
-                    if dict_with_none_smb[key_dict].has_key(symbol_lower):
+                if dict_with_none_smb.get(key_dict) is not None:
+                    if dict_with_none_smb[key_dict].get(symbol_lower) is not None:
                         dict_with_none_smb[key_dict][symbol_lower] += 1
                     else:
                         dict_with_none_smb[key_dict][symbol_lower] = 1
                 else:
-                    dict_with_none_smb[key_dict] = { symbol_lower:1}
+                    dict_with_none_smb[key_dict] = {symbol_lower: 1}
     #------------------------------------------------------------
     # сглаживаем особо большое значение весов у некоторых комбинаций
     # это позволяет уменьшить число повторяемых паролей
@@ -105,14 +109,15 @@ def gen_dict_all_on_one(liststring, max_value=2.5):
         for key2 in dict_with_none_smb[key]:
             summa += dict_with_none_smb[key][key2]
             counter += 1
-        middle_value = summa/counter
+        middle_value = summa / counter
         for key2 in dict_with_none_smb[key]:
-            if dict_with_none_smb[key][key2] > middle_value*max_value:
-                dict_with_none_smb[key][key2] = middle_value*max_value
+            if dict_with_none_smb[key][key2] > middle_value * max_value:
+                dict_with_none_smb[key][key2] = middle_value * max_value
         summa = 0
         counter = 0
         middle_value = 0
     return dict_with_none_smb
+
 
 def dict_pass_rules(liststring):
     """ Create dictionary rules for generate passwords
@@ -124,12 +129,13 @@ def dict_pass_rules(liststring):
     main_dict['all_on_one'] = gen_dict_all_on_one(liststring)
     return main_dict
 
+
 def random_element(dictionary):
     """ Return random key from dictionary with a light weight
     Arguments:
     - `dictionary`: dictionary type - { 'a':45, 'b':78, 'c':98 }
     """
-    # Возвращает рандомный элемент с учетом его веса 
+    # Возвращает рандомный элемент с учетом его веса
     total = sum(dictionary.values())
     random_num = random.uniform(0, total)
     for key in sorted(dictionary.keys()):
@@ -139,24 +145,25 @@ def random_element(dictionary):
         random_num -= dictionary[key]
     return item
 
+
 #------------------------------------------------------------
-# Функции генерации паролей
+# Password generation functions
 #------------------------------------------------------------
 def gen_password_with_none(main_dict, lenth_pass):
     """generate password on base main_dict['all_on_one']
     Arguments:
-    - `main_dict`: main dictionary include all all mini dictionaries    
+    - `main_dict`: main dictionary include all all mini dictionaries
     - `lenth_pass`: lenth of pass
     """
     password = random_element(main_dict['all_on_one']['NONENONE'])
     two_symbol = 'NONE' + password
-    if main_dict['all_on_one'].has_key(two_symbol):
+    if main_dict['all_on_one'].get(two_symbol) is not None:
         password = password + random_element(main_dict['all_on_one'][two_symbol])
     else:
         password = password + random_element(main_dict['not_found'])
     next_symbols = password
     while len(password) < lenth_pass:
-        if main_dict['all_on_one'].has_key(next_symbols):
+        if main_dict['all_on_one'].get(next_symbols) is not None:
             password = password + random_element(main_dict['all_on_one'][next_symbols])
             next_symbols = password[-2:]
         else:
@@ -164,8 +171,9 @@ def gen_password_with_none(main_dict, lenth_pass):
             next_symbols = password[-2:]
     return password
 
+
 #------------------------------------------------------------
-# вспомогательные функции
+# Additional functions
 #------------------------------------------------------------
 def test_dictionary(num_pass, dictionary, file_pass, lenth_pass):
     """generate big numbers of passwords in file
@@ -186,7 +194,8 @@ def test_dictionary(num_pass, dictionary, file_pass, lenth_pass):
     pfile.flush()
     pfile.close()
     finish = time.time()
-    print "Сгенерировано за %s секунд." % (finish - start)
+    print("Сгенерировано за %s секунд." % (finish - start))
+
 
 def info_passwords(name_file, num_last_password):
     """return information about passwords
@@ -196,12 +205,12 @@ def info_passwords(name_file, num_last_password):
     # возвращает некоторую информацию о сгенерированных в файле паролях
     # такую, как количество паролей, и выводит список наиболее повторяющихся
     import os
-    
+
     num_string = 0
     pfile = open(name_file, 'r')
     for string in pfile.readlines():
         num_string += 1
-    print "Количество паролей: %s" % num_string
+    print("Количество паролей: %s" % num_string)
     pfile.close()
-    print "Последних в списке %s повторяющихся паролей" % num_last_password 
+    print("Последних в списке %s повторяющихся паролей" % num_last_password)
     os.system('cat %s | sort -n | uniq -c | sort -n | tail -n %s' % (name_file, num_last_password))
