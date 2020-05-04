@@ -73,7 +73,7 @@ def gen_dict_all_on_one(liststring, max_value=2.5):
     dict_with_none_smb = {}
     key_dict = ''
     valua_dict = ('NONE', 'NONE')
-    re_patt = re.compile('\w')
+    re_patt = re.compile(r'\w')
     #-------------------------------------------------------------------
     # generates dictionary such as { ab:{c:2, k:7}, NONEc:{d:3}, NONENONE:{s:8, t:9} }
     #-------------------------------------------------------------------
